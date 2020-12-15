@@ -1,4 +1,4 @@
-package gregad.eventmanager.eventcreatorbot.bot.messaging;
+package gregad.eventmanager.eventcreatorbot.bot.messaging.handlers;
 
 import gregad.eventmanager.eventcreatorbot.bot.BotState;
 import gregad.eventmanager.eventcreatorbot.bot.MainMenu;
@@ -6,13 +6,14 @@ import gregad.eventmanager.eventcreatorbot.bot.cache.UserEventDataCache;
 import gregad.eventmanager.eventcreatorbot.service.event_service.EventService;
 import gregad.eventmanager.eventcreatorbot.service.user_service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 /**
  * @author Greg Adler
  */
+@Component
 public class MainMenuInputMessageHandler implements InputMessageHandler {
     private MainMenu mainMenu;
     private UserEventDataCache userEventDataCache;

@@ -1,4 +1,4 @@
-package gregad.eventmanager.eventcreatorbot.bot.messaging;
+package gregad.eventmanager.eventcreatorbot.bot.messaging.handlers;
 
 import gregad.eventmanager.eventcreatorbot.bot.BotState;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;

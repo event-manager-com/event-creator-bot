@@ -28,9 +28,12 @@ public class UserEventDataCache implements DataCache {
         sessionStates.put(userId, botState);
     }
 
+    @SneakyThrows
     @Override
     public BotState getUsersCurrentBotState(Integer userId) {
-        return sessionStates.getIfPresent(userId);
+        return sessionStates.get(userId,()->{
+            setUsersCurrentBotState(userId,BotState.SHOW_MAIN_MENU);
+            return BotState.SHOW_MAIN_MENU;});
     }
 
     @SneakyThrows

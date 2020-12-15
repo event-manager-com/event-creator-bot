@@ -1,14 +1,11 @@
 package gregad.eventmanager.eventcreatorbot.bot;
 
-import gregad.eventmanager.eventcreatorbot.bot.messaging.InputMessageHandler;
+import gregad.eventmanager.eventcreatorbot.bot.messaging.handlers.InputMessageHandler;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,7 +28,6 @@ public class BotStateContext {
         if (isFillingProfileState(currentState)) {
             return messageHandlers.get(BotState.FILLING_EVENT_FORM);
         }
-
         return messageHandlers.get(currentState);
     }
 

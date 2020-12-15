@@ -40,6 +40,7 @@ public class TelegramFacade {
     }
 
     private BotApiMethod<Message> handleInputMessage(Message message) {
+        
         String inputMsg = message.getText();
         int userId = message.getFrom().getId();
         BotState botState;
@@ -50,7 +51,7 @@ public class TelegramFacade {
                 botState = BotState.SHOW_MAIN_MENU;
                 break;
             case "Create new Event":
-                botState = BotState.FILLING_EVENT_FORM;
+                botState = BotState.ASK_TITLE;
                 break;
             case "My Events":
                 botState = BotState.GET_EVENTS;

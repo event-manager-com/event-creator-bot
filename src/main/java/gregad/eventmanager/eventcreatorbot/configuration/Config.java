@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -48,6 +50,8 @@ public class Config {
     @Value("${rest.template.timeout}")
     private long timeout;
     
+    public static final String TELEGRAM_REGISTRATION_URL="https://api.telegram.org/bot";
+    
     
     @Bean
     public Bot bot() throws TelegramApiRequestException {
@@ -61,10 +65,14 @@ public class Config {
         bot.setBotToken(botToken);
         bot.setBotUserName(botUserName);
         bot.setBotWebHookUrl(webHookPath);
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(TELEGRAM_REGISTRATION_URL+botToken+"/setWebhook?url="+webHookPath,
+                HttpMethod.GET,null,Void.class);
         return bot;
     }
     
     @Bean
+    @LoadBalanced
     public RestTemplate restTemplate(RestTemplateBuilder builder){
         return builder.setConnectTimeout(Duration.ofMillis(timeout))
                 .setReadTimeout(Duration.ofMillis(timeout))

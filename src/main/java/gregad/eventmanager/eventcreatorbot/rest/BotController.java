@@ -17,7 +17,6 @@ public class BotController {
 
     @RequestMapping(value = "**", method = RequestMethod.POST)
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
-        System.out.println("cccccccccccccccccc");
         return bot.onWebhookUpdateReceived(update);
     }
 }
