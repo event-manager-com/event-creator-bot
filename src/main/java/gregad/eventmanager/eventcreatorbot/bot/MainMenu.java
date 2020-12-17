@@ -17,16 +17,16 @@ import java.util.List;
 @Component
 public class MainMenu {
     
-    public BotApiMethod<?> getMainMenuMessage(final long chatId, final String textMessage) {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard();
-        final SendMessage mainMenuMessage =
+    public BotApiMethod<?> getMainMenuMessage( long chatId,  String textMessage) {
+         ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard();
+         SendMessage mainMenuMessage =
                 createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
         return mainMenuMessage;
     }
 
     private ReplyKeyboardMarkup getMainMenuKeyboard() {
 
-        final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
@@ -35,21 +35,20 @@ public class MainMenu {
 
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        row1.add(new KeyboardButton("Create new Event"));
-        row2.add(new KeyboardButton("My Events"));
-        row3.add(new KeyboardButton("Help"));
+        row1.add(new KeyboardButton("New Event"));
+        row1.add(new KeyboardButton("My Events"));
+        row2.add(new KeyboardButton("Help"));
+        row2.add(new KeyboardButton("Step Back"));
         keyboard.add(row1);
         keyboard.add(row2);
-        keyboard.add(row3);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
 
-    private SendMessage createMessageWithKeyboard(final long chatId,
+    private SendMessage createMessageWithKeyboard( long chatId,
                                                   String textMessage,
-                                                  final ReplyKeyboardMarkup replyKeyboardMarkup) {
-        final SendMessage sendMessage = new SendMessage();
+                                                   ReplyKeyboardMarkup replyKeyboardMarkup) {
+        SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(chatId);
         sendMessage.setText(textMessage);

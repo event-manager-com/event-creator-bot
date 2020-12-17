@@ -7,10 +7,7 @@ import gregad.eventmanager.eventcreatorbot.service.user_service.UserService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import static gregad.eventmanager.eventcreatorbot.api.ApiConstants.*;
@@ -56,6 +53,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(int id, String name) {
         HttpHeaders httpHeaders=getHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         String userJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new UserDto(id, name));
         ResponseEntity<UserDto> response =
                 restTemplate.exchange(userServiceUrl+"/"+id,

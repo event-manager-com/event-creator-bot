@@ -7,5 +7,5 @@ import gregad.eventmanager.eventcreatorbot.dto.ImageResponseDto;
  * @author Greg Adler
  */
 public interface ImageService {
-    ImageResponseDto createImage(int imageId, EventDto eventDto);
+    ImageResponseDto createImage(String imageId, EventDto eventDto);
 }
