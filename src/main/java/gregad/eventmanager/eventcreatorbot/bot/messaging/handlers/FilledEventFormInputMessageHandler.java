@@ -1,11 +1,11 @@
 package gregad.eventmanager.eventcreatorbot.bot.messaging.handlers;
 
 import gregad.eventmanager.eventcreatorbot.bot.constants.BotState;
-import gregad.eventmanager.eventcreatorbot.bot.EventModel;
+import gregad.eventmanager.eventcreatorbot.bot.cache.chache_data_model.EventModel;
 import gregad.eventmanager.eventcreatorbot.bot.MainMenu;
 import gregad.eventmanager.eventcreatorbot.bot.cache.UserEventDataCache;
 import gregad.eventmanager.eventcreatorbot.bot.constants.BotStateStep;
-import gregad.eventmanager.eventcreatorbot.bot.messaging.ReplyMessagesService;
+import gregad.eventmanager.eventcreatorbot.bot.messaging.utils.ReplyMessagesService;
 import gregad.eventmanager.eventcreatorbot.dto.EventDto;
 import gregad.eventmanager.eventcreatorbot.dto.ImageResponseDto;
 import gregad.eventmanager.eventcreatorbot.service.event_service.EventService;
@@ -160,7 +160,7 @@ public class FilledEventFormInputMessageHandler implements InputMessageHandler {
                 "Date: " + date + "\n" +
                 "Time: " + time + "\n" +
                 "Image template: " + userEventData.getImageUrl() + "\n\n" +
-                "Press <Submit> to generate invitation, or <Step back> to edit";
+                "Press <Submit> to generate invitation,\n or <Step back> to edit";
     }
 
     private ReplyKeyboard getReplyMarkup() {

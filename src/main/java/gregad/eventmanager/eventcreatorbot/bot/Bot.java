@@ -1,23 +1,16 @@
 package gregad.eventmanager.eventcreatorbot.bot;
 
-import gregad.eventmanager.eventcreatorbot.service.event_service.EventService;
-import gregad.eventmanager.eventcreatorbot.service.user_service.UserService;
-import lombok.NonNull;
+import gregad.eventmanager.eventcreatorbot.api.ApiConstants;
+import gregad.eventmanager.eventcreatorbot.bot.constants.BotConstants;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.File;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Greg Adler
@@ -30,11 +23,11 @@ public class Bot extends TelegramWebhookBot {
     private String botWebHookUrl;
     
 
-    @Autowired
     private TelegramFacade telegramFacade;
     
-    public Bot(DefaultBotOptions options){
+    public Bot(DefaultBotOptions options, TelegramFacade telegramFacade){
         super(options);
+        this.telegramFacade=telegramFacade;
     }
     
     @Override
@@ -47,20 +40,16 @@ public class Bot extends TelegramWebhookBot {
         return botToken;
     }
 
+    @SneakyThrows
     @Override
     public BotApiMethod onWebhookUpdateReceived(Update update) {
+//        SendPhoto sendPhoto = new SendPhoto();
+//        sendPhoto.setChatId(update.hasCallbackQuery()?update.getCallbackQuery().getMessage().getChatId():update.getMessage().getChatId());
+//        sendPhoto.setPhoto(new File(BotConstants.PATH_TO_TEMPLATES+"\\Other\\other.jpg"));
+//        execute(sendPhoto);
         return telegramFacade.handleUpdate(update);
     }
     
-    @SneakyThrows
-    public void sendPhoto(long chatId, String imageCaption, String imagePath) {
-        File image = ResourceUtils.getFile("classpath:" + imagePath);
-        SendPhoto sendPhoto = new SendPhoto().setPhoto(image);
-        sendPhoto.setChatId(chatId);
-        sendPhoto.setCaption(imageCaption);
-        execute(sendPhoto);
-    }
-
 
     @Override
     public String getBotPath() {

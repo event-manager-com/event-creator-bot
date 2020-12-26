@@ -54,14 +54,14 @@ public class Config {
     
     
     @Bean
-    public Bot bot() throws TelegramApiRequestException {
+    public Bot bot(TelegramFacade telegramFacade) throws TelegramApiRequestException {
         DefaultBotOptions options = ApiContext
                 .getInstance(DefaultBotOptions.class);
 
         options.setProxyHost(proxyHost);
         options.setProxyPort(proxyPort);
         options.setProxyType(proxyType);
-        Bot bot = new Bot(options);
+        Bot bot = new Bot(options,telegramFacade);
         bot.setBotToken(botToken);
         bot.setBotUserName(botUserName);
         bot.setBotWebHookUrl(webHookPath);

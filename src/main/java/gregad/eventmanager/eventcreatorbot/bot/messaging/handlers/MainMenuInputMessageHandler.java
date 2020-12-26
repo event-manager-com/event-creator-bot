@@ -3,6 +3,7 @@ package gregad.eventmanager.eventcreatorbot.bot.messaging.handlers;
 import gregad.eventmanager.eventcreatorbot.bot.constants.BotState;
 import gregad.eventmanager.eventcreatorbot.bot.MainMenu;
 import gregad.eventmanager.eventcreatorbot.bot.cache.UserEventDataCache;
+import gregad.eventmanager.eventcreatorbot.bot.constants.BotStateStep;
 import gregad.eventmanager.eventcreatorbot.dto.UserDto;
 import gregad.eventmanager.eventcreatorbot.service.event_service.EventService;
 import gregad.eventmanager.eventcreatorbot.service.user_service.UserService;
@@ -21,17 +22,10 @@ import org.telegram.telegrambots.meta.api.objects.User;
 public class MainMenuInputMessageHandler implements InputMessageHandler {
     private MainMenu mainMenu;
     private UserEventDataCache userEventDataCache;
-    private EventService eventService;
-    private UserService userService;
-
     @Autowired
     public MainMenuInputMessageHandler(UserEventDataCache userEventDataCache,
-                                       EventService eventService,
-                                       UserService userService,
                                        MainMenu mainMenu) {
         this.userEventDataCache = userEventDataCache;
-        this.eventService = eventService;
-        this.userService = userService;
         this.mainMenu=mainMenu;
     }
 
@@ -52,6 +46,7 @@ public class MainMenuInputMessageHandler implements InputMessageHandler {
         String firstName = from.getFirstName();
         String lastName = from.getLastName()==null?"":from.getLastName();
         userEventDataCache.SaveUserData(new UserDto(id,firstName+" "+lastName));
+        userEventDataCache.setUsersCurrentBotStateStep(id, BotStateStep.NO_STATE_STEP);
         return mainMenu.getMainMenuMessage(chatId,"Use menu for navigation");
     }
 

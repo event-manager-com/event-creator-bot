@@ -2,10 +2,10 @@ package gregad.eventmanager.eventcreatorbot.bot.cache;
 
 import gregad.eventmanager.eventcreatorbot.bot.constants.BotState;
 import gregad.eventmanager.eventcreatorbot.bot.constants.BotStateStep;
-import gregad.eventmanager.eventcreatorbot.bot.EventModel;
+import gregad.eventmanager.eventcreatorbot.bot.cache.chache_data_model.*;
 import gregad.eventmanager.eventcreatorbot.dto.EventResponseDto;
 import gregad.eventmanager.eventcreatorbot.dto.UserDto;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.util.List;
 
@@ -24,10 +24,17 @@ public interface DataCache {
     
     UserDto getUserData(Integer userId);
     void SaveUserData(UserDto userDto);
+
+    List<EventResponseDto> getUserEventsByFilter(Integer userId, String filter);
+    void setUserEventsByFilter(Integer userId, String filter, List<EventResponseDto> userEvents);
+
+    InlineKeyboardMarkup getCalendarKeyboard(String name);
+    void setCalendarKeyboard(String name, InlineKeyboardMarkup keyboard);
+
+    InlineKeyboardMarkup getImageTemplateKeyboard(String name);
+    void setImageTemplateKeyboard(String name, InlineKeyboardMarkup keyboard);
+
+    EventFilterDates getEventFilterDates(int userId);
+    void setEventFilterDates(int userId,EventFilterDates eventFilterDates);
     
-    List<EventResponseDto> getUserEvents(Integer userId);
-    void setUserEvents(Integer userId,List<EventResponseDto> userEvents);
-    
-    ReplyKeyboard getCalendarKeyboard(String name);
-    void setCalendarKeyboard(String name, ReplyKeyboard keyboard);
 }

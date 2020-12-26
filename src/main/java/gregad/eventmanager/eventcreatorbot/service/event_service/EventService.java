@@ -18,6 +18,5 @@ public interface EventService {
     List<EventResponseDto> getEventByTitle(int ownerId, String title);
     List<EventResponseDto> getFutureEvents(int ownerId);
     List<EventResponseDto> getEventsByDate(int ownerId, LocalDate from, LocalDate to);
-    List<EventResponseDto> getEventsByInvitedUser(int ownerId, int userInvitedId);
-    List<UserDto> addEventNewGuest(long eventId, UserDto user);
+    List<EventResponseDto> getEventsByInvitedUser(int ownerId, String userInvited);
 }

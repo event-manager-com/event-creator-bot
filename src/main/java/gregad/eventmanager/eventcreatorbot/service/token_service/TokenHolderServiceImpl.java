@@ -45,7 +45,7 @@ public class TokenHolderServiceImpl implements TokenHolderService {
 
     @Override
     @SneakyThrows
-    @Scheduled(cron = "0 15 0 * * *")
+    @Scheduled(cron = "0 25 0 * * *")
     public void refreshToken() {
         String jsonNamePassword = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(namePassword);
         HttpHeaders httpHeaders = new HttpHeaders();

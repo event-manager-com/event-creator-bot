@@ -2,11 +2,13 @@ package gregad.eventmanager.eventcreatorbot.bot;
 
 import gregad.eventmanager.eventcreatorbot.bot.cache.UserEventDataCache;
 import gregad.eventmanager.eventcreatorbot.bot.constants.BotState;
-import org.springframework.context.annotation.Lazy;
+import gregad.eventmanager.eventcreatorbot.bot.constants.BotStateStep;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import static gregad.eventmanager.eventcreatorbot.bot.constants.BotState.*;
 
 /**
  * @author Greg Adler
@@ -16,17 +18,15 @@ public class TelegramFacade {
     private BotStateContext botStateContext;
     private UserEventDataCache userDataCache;
     private MainMenu mainMenu;
-    private Bot bot;
 
-    public TelegramFacade(@Lazy Bot bot, BotStateContext botStateContext, UserEventDataCache userDataCache, MainMenu mainMenu) {
+    public TelegramFacade( BotStateContext botStateContext, UserEventDataCache userDataCache, MainMenu mainMenu) {
         this.botStateContext = botStateContext;
         this.userDataCache = userDataCache;
         this.mainMenu=mainMenu;
-        this.bot=bot;
     }
 
     public BotApiMethod<?> handleUpdate(Update update) {
-        BotApiMethod<?> replyMessage = null;
+        BotApiMethod<?> replyMessage;
         replyMessage = handleInputMessage(update);
         return replyMessage;
     }
@@ -44,29 +44,35 @@ public class TelegramFacade {
         }
         BotState botState;
         BotApiMethod replyMessage;
+        if (inputMsg==null){
+            return botStateContext.processInputMessage(SHOW_MAIN_MENU, update);
+        }
         switch (inputMsg) {
             case "/start":
-                botState = BotState.SHOW_MAIN_MENU;
+                botState = SHOW_MAIN_MENU;
+                userDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.NO_STATE_STEP);
                 break;
             case "New Event":
-                botState=BotState.FILLING_EVENT_FORM;
+                botState=FILLING_EVENT_FORM;
+                userDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.NO_STATE_STEP);
                 break;
             case "My Events":
-                botState = BotState.GET_EVENTS;
+                botState = GET_EVENTS;
+                userDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.NO_STATE_STEP);
                 break;
             case "Step Back":
-                botState = BotState.STEP_BACK;
-                System.out.println(botState);
+                botState = STEP_BACK;
                 break;
             case "Help":
                 botState = BotState.SHOW_HELP_MENU;
+                userDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.NO_STATE_STEP);
                 break;
             default:
                 botState = userDataCache.getUsersCurrentBotState(userId);
                 break;
         }
-        System.out.println(inputMsg);
-        System.out.println(botState);
+//        System.out.println(inputMsg);
+//        System.out.println(botState);
         userDataCache.setUsersCurrentBotState(userId, botState);
 
         replyMessage = botStateContext.processInputMessage(botState, update);
