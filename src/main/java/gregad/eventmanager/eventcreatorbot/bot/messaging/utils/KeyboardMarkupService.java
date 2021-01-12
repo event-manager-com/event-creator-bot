@@ -22,13 +22,13 @@ public class KeyboardMarkupService {
 
     public InlineKeyboardMarkup getInlineKeyboardMarkupInRange(int from, int to) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>>buttons=new ArrayList<>();
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
         for (int i = from; i <= to; i++) {
-            keyboardButtonsRow.add(getButton(i+"",i+""));
-            if (i%6==0){
+            keyboardButtonsRow.add(getButton(i + "", i + ""));
+            if (i % 6 == 0) {
                 buttons.add(keyboardButtonsRow);
-                keyboardButtonsRow=new ArrayList<>();
+                keyboardButtonsRow = new ArrayList<>();
             }
         }
         buttons.add(keyboardButtonsRow);
@@ -36,7 +36,7 @@ public class KeyboardMarkupService {
         return inlineKeyboardMarkup;
     }
 
-    private InlineKeyboardButton getButton(String text,String callbackValue) {
+    private InlineKeyboardButton getButton(String text, String callbackValue) {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText(text);
         return button.setCallbackData(callbackValue);
@@ -45,23 +45,23 @@ public class KeyboardMarkupService {
 
 
     public InlineKeyboardMarkup getTemplatesInlineKeyboardMarkup(String myUrl, String eventType) {
-        List<List<InlineKeyboardButton>>buttons=new ArrayList<>();
-        List<InlineKeyboardButton>row=new ArrayList<>();
-        String url=myUrl+"/template/";
-        File dir=new File(PATH_TO_TEMPLATES+eventType+"\\");
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        String url = myUrl + "/template/";
+        File dir = new File(PATH_TO_TEMPLATES + eventType + "\\");
         File[] files = dir.listFiles();
         for (int i = 0; i < files.length; i++) {
             String imageName = files[i].getName();
-            InlineKeyboardButton valueButton=new InlineKeyboardButton();
-            InlineKeyboardButton linkButton=new InlineKeyboardButton();
-            valueButton.setText(i+"");
+            InlineKeyboardButton valueButton = new InlineKeyboardButton();
+            InlineKeyboardButton linkButton = new InlineKeyboardButton();
+            valueButton.setText(i + "");
             valueButton.setCallbackData(imageName);
-            linkButton.setText("Click to see "+imageName);
-            linkButton.setUrl(url+eventType+imageName);
+            linkButton.setText("Click to see " + imageName);
+            linkButton.setUrl(url + eventType + "/" + imageName);
             row.add(valueButton);
             row.add(linkButton);
             buttons.add(row);
-            row=new ArrayList<>();
+            row = new ArrayList<>();
         }
         return new InlineKeyboardMarkup().setKeyboard(buttons);
 
@@ -87,37 +87,38 @@ public class KeyboardMarkupService {
     public InlineKeyboardMarkup getFilterOptionsKeyboardMarkup() {
         List<String> options = Arrays.asList(EVENTS_BY_TITLE, FUTURE_EVENTS, EVENTS_BETWEEN_DATES, EVENTS_BY_GUEST);
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>>buttons=new ArrayList<>();
-        List<InlineKeyboardButton>row=new ArrayList<>();
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
         for (String option : options) {
             InlineKeyboardButton button = new InlineKeyboardButton();
             button.setText(option);
             button.setCallbackData(option);
             row.add(button);
             buttons.add(row);
-            row=new ArrayList<>();
+            row = new ArrayList<>();
         }
         return inlineKeyboardMarkup.setKeyboard(buttons);
     }
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
     public InlineKeyboardMarkup getEventsKeyboardMarkup(List<EventResponseDto> events, int buttonsInLine) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>>buttons=new ArrayList<>();
-        List<InlineKeyboardButton>row=new ArrayList<>();
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
-            if (i>0 && i%buttonsInLine==0){
+            if (i > 0 && i % buttonsInLine == 0) {
                 buttons.add(row);
-                row=new ArrayList<>();
+                row = new ArrayList<>();
             }
             EventResponseDto eventResponseDto = events.get(i);
-            InlineKeyboardButton button = getButton(eventResponseDto.getTitle(),eventResponseDto.getId()+"");
+            InlineKeyboardButton button = getButton(eventResponseDto.getTitle(), eventResponseDto.getId() + "");
             row.add(button);
         }
-        if (!row.isEmpty()){
+        if (!row.isEmpty()) {
             buttons.add(row);
         }
-        if (buttonsInLine==1){
-            getButton(REFRESH_FILTER,REFRESH_FILTER);
+        if (buttonsInLine == 1) {
+            getButton(REFRESH_FILTER, REFRESH_FILTER);
             buttons.add(row);
         }
         return inlineKeyboardMarkup.setKeyboard(buttons);

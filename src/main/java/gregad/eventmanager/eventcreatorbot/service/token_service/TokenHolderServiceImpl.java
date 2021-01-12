@@ -29,7 +29,7 @@ public class TokenHolderServiceImpl implements TokenHolderService {
     private String secUserName;
     @Value("${security.user.password}")
     private String secPassword;
-    
+
     private NamePassword namePassword;
 
     @Autowired
@@ -37,10 +37,10 @@ public class TokenHolderServiceImpl implements TokenHolderService {
         this.objectMapper = objectMapper;
         this.restTemplate = restTemplate;
     }
-    
+
     @PostConstruct
-    void initNamePassword(){
-        namePassword=new NamePassword(secUserName,secPassword);
+    void initNamePassword() {
+        namePassword = new NamePassword(secUserName, secPassword);
     }
 
     @Override

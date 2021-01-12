@@ -46,29 +46,30 @@ public class FilledEventFormInputMessageHandler implements InputMessageHandler {
 
     @Autowired
     public FilledEventFormInputMessageHandler(UserEventDataCache userEventDataCache,
-                                               ReplyMessagesService replyMessagesService,
-                                               MainMenu mainMenu,
-                                               EventService eventService,
-                                               ImageService imageService) {
+                                              ReplyMessagesService replyMessagesService,
+                                              MainMenu mainMenu,
+                                              EventService eventService,
+                                              ImageService imageService) {
         this.userEventDataCache = userEventDataCache;
         this.replyMessagesService = replyMessagesService;
-        this.mainMenu=mainMenu;
+        this.mainMenu = mainMenu;
         this.eventService = eventService;
         this.imageService = imageService;
     }
+
     @Override
     public BotApiMethod<?> handle(Update update) {
         String answer;
         int userId;
         long chatId;
-        if (update.hasCallbackQuery()){
+        if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
-            answer=callbackQuery.getData();
-            userId=callbackQuery.getFrom().getId();
-            chatId=callbackQuery.getMessage().getChatId();
-        }else {
+            answer = callbackQuery.getData();
+            userId = callbackQuery.getFrom().getId();
+            chatId = callbackQuery.getMessage().getChatId();
+        } else {
             Message message = update.getMessage();
-            answer=message.getText();
+            answer = message.getText();
             userId = message.getFrom().getId();
             chatId = message.getChatId();
         }
@@ -76,38 +77,38 @@ public class FilledEventFormInputMessageHandler implements InputMessageHandler {
 
         BotStateStep usersCurrentBotStateStep = userEventDataCache.getUsersCurrentBotStateStep(userId);
         EventModel userEventData = userEventDataCache.getCurrentEventData(userId);
-        
-        if (usersCurrentBotStateStep==EVENT_FORM_VALIDATION){
+
+        if (usersCurrentBotStateStep == EVENT_FORM_VALIDATION) {
             return processEventFormValidation(answer, userId, chatId, userEventData);
         }
-        
-        if (usersCurrentBotStateStep== EVENT_FORM_CONFIRMATION){
+
+        if (usersCurrentBotStateStep == EVENT_FORM_CONFIRMATION) {
             if (answer.equals(SUBMIT_BUTTON_VALUE)) {
-                EventDto event=convertToEventDto(userEventData);
-                if (userEventData.getImageUrl()!=null || !userEventData.getImageUrl().isEmpty()){
+                EventDto event = convertToEventDto(userEventData);
+                if (userEventData.getImageUrl() != null || !userEventData.getImageUrl().isEmpty()) {
                     ImageResponseDto image = imageService.createImage(userEventData.getImageUrl(), event);
                     userEventData.setImageUrl(image.getSelf());
-                }else {
+                } else {
                     userEventData.setImageUrl(createTextInvitation(userEventData));
                 }
                 eventService.createEvent(event);
-                userEventDataCache.setUsersCurrentBotStateStep(userId,NO_STATE_STEP);
-                userEventDataCache.setUsersCurrentBotState(userId,BotState.SHOW_MAIN_MENU);
-                userEventDataCache.saveCurrentEventData(userId,userEventData);
-            }else {
-                userEventDataCache.setUsersCurrentBotStateStep(userId,EVENT_FORM_VALIDATION);
-                return replyMessagesService.getReplyMessage(chatId,"reply.askTemplate");
+                userEventDataCache.setUsersCurrentBotStateStep(userId, NO_STATE_STEP);
+                userEventDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
+                userEventDataCache.saveCurrentEventData(userId, userEventData);
+            } else {
+                userEventDataCache.setUsersCurrentBotStateStep(userId, EVENT_FORM_VALIDATION);
+                return replyMessagesService.getReplyMessage(chatId, "reply.askTemplate");
             }
         }
-        return mainMenu.getMainMenuMessage(chatId,answer);
+        return mainMenu.getMainMenuMessage(chatId, answer);
     }
 
     private BotApiMethod<?> processEventFormValidation(String answer, int userId, long chatId, EventModel userEventData) {
         userEventData.setOwner(userEventDataCache.getUserData(userId));
         userEventData.setTelegramChannelRef(createTelegramChannel(userId));
         userEventData.setImageUrl(answer);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,EVENT_FORM_CONFIRMATION);
-        String message=buildMessage(userEventData);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, EVENT_FORM_CONFIRMATION);
+        String message = buildMessage(userEventData);
         SendMessage sendMessage = new SendMessage(chatId, message);
         sendMessage.setReplyMarkup(getReplyMarkup());
         return sendMessage;
@@ -143,7 +144,7 @@ public class FilledEventFormInputMessageHandler implements InputMessageHandler {
                 .append(":")
                 .append(userEventData.getMinute())
                 .append(" o'clock\n");
-        if (userEventData.getDescription()!=null || !userEventData.getDescription().isEmpty()){
+        if (userEventData.getDescription() != null || !userEventData.getDescription().isEmpty()) {
             sb.append("Description: \n").append(userEventData.getDescription());
         }
         sb.append("to receive and discuss details, follow the link\n");
@@ -152,8 +153,8 @@ public class FilledEventFormInputMessageHandler implements InputMessageHandler {
     }
 
     private String buildMessage(EventModel userEventData) {
-        String date=userEventData.getYear()+"/"+userEventData.getMonth()+"/"+userEventData.getDay();
-        String time=userEventData.getHour()+":"+userEventData.getMinute();
+        String date = userEventData.getYear() + "/" + userEventData.getMonth() + "/" + userEventData.getDay();
+        String time = userEventData.getHour() + ":" + userEventData.getMinute();
         return "User name: " + userEventData.getOwner().getName() + "\n" +
                 "Title: " + userEventData.getTitle() + "\n" +
                 "Description: " + userEventData.getDescription() + "\n" +
@@ -165,18 +166,18 @@ public class FilledEventFormInputMessageHandler implements InputMessageHandler {
 
     private ReplyKeyboard getReplyMarkup() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton buttonSubmit = getButton("Submit",SUBMIT_BUTTON_VALUE);
-        InlineKeyboardButton buttonBack = getButton("Step back",STEP_BACK_BUTTON_VALUE);
+        InlineKeyboardButton buttonSubmit = getButton("Submit", SUBMIT_BUTTON_VALUE);
+        InlineKeyboardButton buttonBack = getButton("Step back", STEP_BACK_BUTTON_VALUE);
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
         keyboardButtonsRow1.add(buttonSubmit);
         keyboardButtonsRow1.add(buttonBack);
         return inlineKeyboardMarkup.setKeyboard(Collections.singletonList(keyboardButtonsRow1));
     }
 
-    private InlineKeyboardButton getButton(String text,String callbackValue) {
+    private InlineKeyboardButton getButton(String text, String callbackValue) {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText(text);
-       return button.setCallbackData(callbackValue);
+        return button.setCallbackData(callbackValue);
     }
 
     private String createTelegramChannel(int userId) {

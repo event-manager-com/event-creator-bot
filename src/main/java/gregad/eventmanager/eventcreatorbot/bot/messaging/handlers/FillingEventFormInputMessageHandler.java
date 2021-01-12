@@ -32,7 +32,7 @@ import static gregad.eventmanager.eventcreatorbot.bot.constants.BotStateStep.*;
  */
 @Component
 public class FillingEventFormInputMessageHandler implements InputMessageHandler {
-    
+
     private UserEventDataCache userEventDataCache;
     private ReplyMessagesService replyMessagesService;
     private KeyboardMarkupService keyboardMarkupService;
@@ -45,20 +45,20 @@ public class FillingEventFormInputMessageHandler implements InputMessageHandler 
                                                KeyboardMarkupService keyboardMarkupService) {
         this.userEventDataCache = userEventDataCache;
         this.replyMessagesService = replyMessagesService;
-        this.keyboardMarkupService=keyboardMarkupService;
+        this.keyboardMarkupService = keyboardMarkupService;
     }
-    
+
 
     @Override
     public BotApiMethod<?> handle(Update update) {
-        
+
         User from;
-        if (update.hasCallbackQuery()){
-            from=update.getCallbackQuery().getFrom();
-        }else {
-            from=update.getMessage().getFrom();
+        if (update.hasCallbackQuery()) {
+            from = update.getCallbackQuery().getFrom();
+        } else {
+            from = update.getMessage().getFrom();
         }
-        if (userEventDataCache.getUsersCurrentBotStateStep(from.getId())==NO_STATE_STEP) {
+        if (userEventDataCache.getUsersCurrentBotStateStep(from.getId()) == NO_STATE_STEP) {
             userEventDataCache.setUsersCurrentBotStateStep(from.getId(), ASK_TITLE);
         }
         return processUserInput(update);
@@ -68,14 +68,14 @@ public class FillingEventFormInputMessageHandler implements InputMessageHandler 
         String answer;
         int userId;
         long chatId;
-        if (update.hasCallbackQuery()){
+        if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
-            answer=callbackQuery.getData();
-            userId=callbackQuery.getFrom().getId();
-            chatId=callbackQuery.getMessage().getChatId();
-        }else {
+            answer = callbackQuery.getData();
+            userId = callbackQuery.getFrom().getId();
+            chatId = callbackQuery.getMessage().getChatId();
+        } else {
             Message message = update.getMessage();
-            answer=message.getText();
+            answer = message.getText();
             userId = message.getFrom().getId();
             chatId = message.getChatId();
         }
@@ -83,137 +83,137 @@ public class FillingEventFormInputMessageHandler implements InputMessageHandler 
 
         BotStateStep usersCurrentBotStateStep = userEventDataCache.getUsersCurrentBotStateStep(userId);
         EventModel userEventData = userEventDataCache.getCurrentEventData(userId);
-        if (usersCurrentBotStateStep==ASK_TITLE){
-            userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_DESCRIPTION);
-            return replyMessagesService.getReplyMessage(chatId,"reply.askTitle");
+        if (usersCurrentBotStateStep == ASK_TITLE) {
+            userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_DESCRIPTION);
+            return replyMessagesService.getReplyMessage(chatId, "reply.askTitle");
         }
-        if (usersCurrentBotStateStep==ASK_DESCRIPTION){
+        if (usersCurrentBotStateStep == ASK_DESCRIPTION) {
             return processDescriptionRequest(answer, userId, chatId, userEventData);
         }
-        if (usersCurrentBotStateStep==ASK_YEAR){
+        if (usersCurrentBotStateStep == ASK_YEAR) {
             return processYearRequest(answer, userId, chatId, userEventData);
         }
-        if (usersCurrentBotStateStep==ASK_MONTH){
+        if (usersCurrentBotStateStep == ASK_MONTH) {
             return processMonthRequest(answer, userId, chatId, userEventData);
         }
-        if (usersCurrentBotStateStep==ASK_DAY){
+        if (usersCurrentBotStateStep == ASK_DAY) {
             return processDayRequest(answer, userId, chatId, userEventData);
         }
-        if (usersCurrentBotStateStep==ASK_HOUR){
+        if (usersCurrentBotStateStep == ASK_HOUR) {
             return processHourRequest(answer, userId, chatId, userEventData);
         }
-        if (usersCurrentBotStateStep==ASK_EVENT_TYPE){
+        if (usersCurrentBotStateStep == ASK_EVENT_TYPE) {
             return processEventTypeRequest(answer, userId, chatId, userEventData);
         }
-        if (usersCurrentBotStateStep==ASK_TEMPLATE){
+        if (usersCurrentBotStateStep == ASK_TEMPLATE) {
             return processTemplateRequest(answer, userId, chatId, userEventData);
         }
 
         userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_DESCRIPTION);
-        return replyMessagesService.getReplyMessage(chatId,"reply.askTitle");
+        return replyMessagesService.getReplyMessage(chatId, "reply.askTitle");
     }
 //////////////////////////////////////////    EVENT_TYPE
-    
+
     private BotApiMethod<?> processEventTypeRequest(String answer, int userId, long chatId, EventModel userEventData) {
-        if (!StringUtils.isNumeric(answer)){
+        if (!StringUtils.isNumeric(answer)) {
             SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askHour");
             InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(HOUR_CALENDAR);
-            if (isEmptyKeyboard(calendarKeyboard)){
-                calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(1,24);
-                userEventDataCache.setCalendarKeyboard(HOUR_CALENDAR,calendarKeyboard);
+            if (isEmptyKeyboard(calendarKeyboard)) {
+                calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, 24);
+                userEventDataCache.setCalendarKeyboard(HOUR_CALENDAR, calendarKeyboard);
             }
             return replyMessage.setReplyMarkup(calendarKeyboard);
         }
 
         int hour = Integer.parseInt(answer);
-        userEventData.setHour(hour>24?0:hour);
+        userEventData.setHour(hour > 24 ? 0 : hour);
         userEventData.setMinute(0);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_TEMPLATE);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_TEMPLATE);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askEventType");
         InlineKeyboardMarkup inlineKeyboardMarkup = keyboardMarkupService.getEventTypesInlineKeyboardMarkup();
         return replyMessage.setReplyMarkup(inlineKeyboardMarkup);
     }
-    
+
 //////////////////////////////////////////    TEMPLATE
 
     @SneakyThrows
     private BotApiMethod<?> processTemplateRequest(String answer, int userId, long chatId, EventModel userEventData) {
-        if (isIllegalAnswer(answer)){
-            answer=OTHER;
+        if (isIllegalAnswer(answer)) {
+            answer = OTHER;
         }
         userEventData.setEventType(answer);
-        userEventDataCache.setUsersCurrentBotState(userId,EVENT_FILLED);
+        userEventDataCache.setUsersCurrentBotState(userId, EVENT_FILLED);
         userEventDataCache.setUsersCurrentBotStateStep(userId, EVENT_FORM_VALIDATION);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askTemplate");
         InlineKeyboardMarkup imageTemplateKeyboard = userEventDataCache.getImageTemplateKeyboard(answer);
-        if (isEmptyKeyboard(imageTemplateKeyboard)){
-            imageTemplateKeyboard=keyboardMarkupService.getTemplatesInlineKeyboardMarkup(myUrl,answer);
-            userEventDataCache.setImageTemplateKeyboard(answer,imageTemplateKeyboard);
+        if (isEmptyKeyboard(imageTemplateKeyboard)) {
+            imageTemplateKeyboard = keyboardMarkupService.getTemplatesInlineKeyboardMarkup(myUrl, answer);
+            userEventDataCache.setImageTemplateKeyboard(answer, imageTemplateKeyboard);
         }
         return replyMessage.setReplyMarkup(imageTemplateKeyboard);
     }
 
     private boolean isIllegalAnswer(String answer) {
-       if( answer==null || answer.isEmpty() ){
-           return true;
-       }
-       return !answer.equals(BIRTHDAY) &&
-               !answer.equals(HOLIDAY) && 
-               !answer.equals(FRIENDS_MEETING) &&
-               !answer.equals(OFFICIAL_MEETING) &&
-               !answer.equals(MARY_CHRISTMAS);
+        if (answer == null || answer.isEmpty()) {
+            return true;
+        }
+        return !answer.equals(BIRTHDAY) &&
+                !answer.equals(HOLIDAY) &&
+                !answer.equals(FRIENDS_MEETING) &&
+                !answer.equals(OFFICIAL_MEETING) &&
+                !answer.equals(MARY_CHRISTMAS);
     }
 
     private boolean isEmptyKeyboard(InlineKeyboardMarkup calendarKeyboard) {
-        return calendarKeyboard.getKeyboard()==null|| calendarKeyboard.getKeyboard().isEmpty();
+        return calendarKeyboard.getKeyboard() == null || calendarKeyboard.getKeyboard().isEmpty();
     }
 
     //////////////////////////////////////////    DAY
 
     private BotApiMethod<?> processDayRequest(String answer, int userId, long chatId, EventModel userEventData) {
-        if (!StringUtils.isNumeric(answer)){
+        if (!StringUtils.isNumeric(answer)) {
             SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askMonth");
             InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(MONTH_CALENDAR);
-            if (isEmptyKeyboard(calendarKeyboard)){
-                calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(1,12);
-                userEventDataCache.setCalendarKeyboard(MONTH_CALENDAR,calendarKeyboard);
+            if (isEmptyKeyboard(calendarKeyboard)) {
+                calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, 12);
+                userEventDataCache.setCalendarKeyboard(MONTH_CALENDAR, calendarKeyboard);
             }
             return replyMessage.setReplyMarkup(calendarKeyboard);
         }
         userEventData.setMonth(Integer.parseInt(answer));
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_HOUR);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_HOUR);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askDay");
 
         YearMonth yearMonthObject = YearMonth.of(userEventData.getYear(), userEventData.getMonth());
         int daysInMonth = yearMonthObject.lengthOfMonth();
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(daysInMonth + DAY_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
-            calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(1,daysInMonth);
-            userEventDataCache.setCalendarKeyboard(daysInMonth + DAY_CALENDAR,calendarKeyboard);
+        if (isEmptyKeyboard(calendarKeyboard)) {
+            calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, daysInMonth);
+            userEventDataCache.setCalendarKeyboard(daysInMonth + DAY_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }
 
- //////////////////////////////////////////    MONTH
+    //////////////////////////////////////////    MONTH
 
     private BotApiMethod<?> processMonthRequest(String answer, int userId, long chatId, EventModel userEventData) {
-        if (!StringUtils.isNumeric(answer)){
+        if (!StringUtils.isNumeric(answer)) {
             SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askYear");
             InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(YEAR_FUTURE_CALENDAR);
-            if (isEmptyKeyboard(calendarKeyboard)){
+            if (isEmptyKeyboard(calendarKeyboard)) {
                 int yearNow = LocalDate.now().getYear();
-                calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(yearNow,yearNow+5);
-                userEventDataCache.setCalendarKeyboard(YEAR_FUTURE_CALENDAR,calendarKeyboard);
+                calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(yearNow, yearNow + 5);
+                userEventDataCache.setCalendarKeyboard(YEAR_FUTURE_CALENDAR, calendarKeyboard);
             }
             return replyMessage.setReplyMarkup(calendarKeyboard);
         }
         userEventData.setYear(Integer.parseInt(answer));
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_DAY);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_DAY);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askMonth");
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(MONTH_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
-            calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(1,12);
-            userEventDataCache.setCalendarKeyboard(MONTH_CALENDAR,calendarKeyboard);
+        if (isEmptyKeyboard(calendarKeyboard)) {
+            calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, 12);
+            userEventDataCache.setCalendarKeyboard(MONTH_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }
@@ -221,14 +221,14 @@ public class FillingEventFormInputMessageHandler implements InputMessageHandler 
 //////////////////////////////////////////    YEAR
 
     private BotApiMethod<?> processYearRequest(String answer, int userId, long chatId, EventModel userEventData) {
-        userEventData.setDescription(answer==null?"":answer);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_MONTH);
+        userEventData.setDescription(answer == null ? "" : answer);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_MONTH);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askYear");
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(YEAR_FUTURE_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
+        if (isEmptyKeyboard(calendarKeyboard)) {
             int yearNow = LocalDate.now().getYear();
-            calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(yearNow,yearNow+5);
-            userEventDataCache.setCalendarKeyboard(YEAR_FUTURE_CALENDAR,calendarKeyboard);
+            calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(yearNow, yearNow + 5);
+            userEventDataCache.setCalendarKeyboard(YEAR_FUTURE_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }
@@ -236,31 +236,31 @@ public class FillingEventFormInputMessageHandler implements InputMessageHandler 
 //////////////////////////////////////////    DESCRIPTION
 
     private BotApiMethod<?> processDescriptionRequest(String answer, int userId, long chatId, EventModel userEventData) {
-        if (answer==null || answer.isEmpty()){
-            return replyMessagesService.getReplyMessage(chatId,"reply.askTitleRepeated");
+        if (answer == null || answer.isEmpty()) {
+            return replyMessagesService.getReplyMessage(chatId, "reply.askTitleRepeated");
         }
         userEventData.setTitle(answer);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_YEAR);
-        return replyMessagesService.getReplyMessage(chatId,"reply.askDescription");
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_YEAR);
+        return replyMessagesService.getReplyMessage(chatId, "reply.askDescription");
     }
 
 //////////////////////////////////////////    HOUR
 
     private BotApiMethod<?> processHourRequest(String answer, int userId, long chatId, EventModel userEventData) {
-        if (!StringUtils.isNumeric(answer)){
+        if (!StringUtils.isNumeric(answer)) {
             SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askDay");
             YearMonth yearMonthObject = YearMonth.of(userEventData.getYear(), userEventData.getMonth());
             int daysInMonth = yearMonthObject.lengthOfMonth();
             InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(daysInMonth + "_days");
-            if (isEmptyKeyboard(calendarKeyboard)){
-                calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(1,daysInMonth);
-                userEventDataCache.setCalendarKeyboard(daysInMonth + "_days",calendarKeyboard);
+            if (isEmptyKeyboard(calendarKeyboard)) {
+                calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, daysInMonth);
+                userEventDataCache.setCalendarKeyboard(daysInMonth + "_days", calendarKeyboard);
             }
             return replyMessage.setReplyMarkup(calendarKeyboard);
         }
         userEventData.setDay(Integer.parseInt(answer));
         try {
-            LocalDate.of(userEventData.getYear(),userEventData.getMonth(),userEventData.getDay());
+            LocalDate.of(userEventData.getYear(), userEventData.getMonth(), userEventData.getDay());
         } catch (Exception e) {
             int year = LocalDate.now().getYear();
             SendMessage replyMessage =
@@ -269,12 +269,12 @@ public class FillingEventFormInputMessageHandler implements InputMessageHandler 
                     keyboardMarkupService.getInlineKeyboardMarkupInRange(year, year + 5);
             return replyMessage.setReplyMarkup(inlineKeyboardMarkupInRange);
         }
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_EVENT_TYPE);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_EVENT_TYPE);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askHour");
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(HOUR_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
-            calendarKeyboard= keyboardMarkupService.getInlineKeyboardMarkupInRange(1,24);
-            userEventDataCache.setCalendarKeyboard(HOUR_CALENDAR,calendarKeyboard);
+        if (isEmptyKeyboard(calendarKeyboard)) {
+            calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, 24);
+            userEventDataCache.setCalendarKeyboard(HOUR_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }

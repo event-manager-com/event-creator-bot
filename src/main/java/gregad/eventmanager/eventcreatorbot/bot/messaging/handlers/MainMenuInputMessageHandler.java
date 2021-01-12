@@ -22,32 +22,33 @@ import org.telegram.telegrambots.meta.api.objects.User;
 public class MainMenuInputMessageHandler implements InputMessageHandler {
     private MainMenu mainMenu;
     private UserEventDataCache userEventDataCache;
+
     @Autowired
     public MainMenuInputMessageHandler(UserEventDataCache userEventDataCache,
                                        MainMenu mainMenu) {
         this.userEventDataCache = userEventDataCache;
-        this.mainMenu=mainMenu;
+        this.mainMenu = mainMenu;
     }
 
     @Override
     public BotApiMethod handle(Update update) {
         Long chatId;
         User from;
-        if (update.hasCallbackQuery()){
+        if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
             chatId = callbackQuery.getMessage().getChatId();
-            from=callbackQuery.getFrom();
-        }else {
+            from = callbackQuery.getFrom();
+        } else {
             Message message = update.getMessage();
-            chatId=message.getChatId();
-            from=message.getFrom();
+            chatId = message.getChatId();
+            from = message.getFrom();
         }
         Integer id = from.getId();
         String firstName = from.getFirstName();
-        String lastName = from.getLastName()==null?"":from.getLastName();
-        userEventDataCache.SaveUserData(new UserDto(id,firstName+" "+lastName));
+        String lastName = from.getLastName() == null ? "" : from.getLastName();
+        userEventDataCache.SaveUserData(new UserDto(id, firstName + " " + lastName));
         userEventDataCache.setUsersCurrentBotStateStep(id, BotStateStep.NO_STATE_STEP);
-        return mainMenu.getMainMenuMessage(chatId,"Use menu for navigation");
+        return mainMenu.getMainMenuMessage(chatId, "Use menu for navigation");
     }
 
     @Override

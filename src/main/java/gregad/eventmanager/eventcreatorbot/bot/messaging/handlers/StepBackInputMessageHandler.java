@@ -37,13 +37,13 @@ public class StepBackInputMessageHandler implements InputMessageHandler {
 
 
     public StepBackInputMessageHandler(UserEventDataCache userEventDataCache,
-                                       MainMenu mainMenu, 
+                                       MainMenu mainMenu,
                                        ReplyMessagesService replyMessagesService,
                                        KeyboardMarkupService keyboardMarkupService) {
-        this.mainMenu=mainMenu;
+        this.mainMenu = mainMenu;
         this.userEventDataCache = userEventDataCache;
-        this.replyMessagesService=replyMessagesService;
-        this.keyboardMarkupService=keyboardMarkupService;
+        this.replyMessagesService = replyMessagesService;
+        this.keyboardMarkupService = keyboardMarkupService;
     }
 
     @Override
@@ -51,83 +51,84 @@ public class StepBackInputMessageHandler implements InputMessageHandler {
         String answer;
         int userId;
         long chatId;
-        if (update.hasCallbackQuery()){
+        if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
-            answer=callbackQuery.getData();
-            userId=callbackQuery.getFrom().getId();
-            chatId=callbackQuery.getMessage().getChatId();
-        }else {
+            answer = callbackQuery.getData();
+            userId = callbackQuery.getFrom().getId();
+            chatId = callbackQuery.getMessage().getChatId();
+        } else {
             Message message = update.getMessage();
-            answer=message.getText();
+            answer = message.getText();
             userId = message.getFrom().getId();
             chatId = message.getChatId();
         }
 
         BotStateStep usersCurrentBotStateStep = userEventDataCache.getUsersCurrentBotStateStep(userId);
-        
-        if (usersCurrentBotStateStep==NO_STATE_STEP ||
-                usersCurrentBotStateStep==ASK_TITLE ||
-                usersCurrentBotStateStep==ASK_DESCRIPTION){
-            userEventDataCache.setUsersCurrentBotState(userId,BotState.SHOW_MAIN_MENU);
-            return mainMenu.getMainMenuMessage(chatId," ");
+
+        if (usersCurrentBotStateStep == NO_STATE_STEP ||
+                usersCurrentBotStateStep == ASK_TITLE ||
+                usersCurrentBotStateStep == ASK_DESCRIPTION) {
+            userEventDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
+            return mainMenu.getMainMenuMessage(chatId, " ");
         }
-        if (usersCurrentBotStateStep==ASK_YEAR){
+        if (usersCurrentBotStateStep == ASK_YEAR) {
             return processBackToTitleRequest(userId, chatId);
         }
-        if (usersCurrentBotStateStep==ASK_MONTH){
+        if (usersCurrentBotStateStep == ASK_MONTH) {
             return processBackToDescriptionRequest(userId, chatId);
         }
-        if (usersCurrentBotStateStep==ASK_DAY){
+        if (usersCurrentBotStateStep == ASK_DAY) {
             return processBackToYearRequest(userId, chatId);
         }
-        if (usersCurrentBotStateStep==ASK_HOUR){
+        if (usersCurrentBotStateStep == ASK_HOUR) {
             return processBackToMonthRequest(userId, chatId);
-        }     
-        if (usersCurrentBotStateStep==ASK_EVENT_TYPE){
+        }
+        if (usersCurrentBotStateStep == ASK_EVENT_TYPE) {
             return processBackToDayRequest(userId, chatId);
         }
-        if (usersCurrentBotStateStep==ASK_TEMPLATE){
+        if (usersCurrentBotStateStep == ASK_TEMPLATE) {
             return processBackToHourRequest(userId, chatId);
         }
-        if (usersCurrentBotStateStep== EVENT_FORM_VALIDATION){
+        if (usersCurrentBotStateStep == EVENT_FORM_VALIDATION) {
             return processBackToTypeRequest(userId, chatId);
         }
-        if (usersCurrentBotStateStep== EVENT_FORM_CONFIRMATION){
+        if (usersCurrentBotStateStep == EVENT_FORM_CONFIRMATION) {
             return processBackToTemplateRequest(userId, chatId);
         }
-        
-        if (usersCurrentBotStateStep==MY_FUTURE_EVENTS ||
-            usersCurrentBotStateStep==MY_EVENTS_BY_GUEST ||
-            usersCurrentBotStateStep==MY_EVENTS_BY_TITLE||
-            usersCurrentBotStateStep==SHOW_FILTERED_EVENTS_BY_DATES_WAIT|| 
-            usersCurrentBotStateStep==MY_EVENTS_BY_DATE_FROM_YEAR||
-            usersCurrentBotStateStep==MY_EVENTS_BY_DATE_FROM_MONTH){
-            return processBackToFiltersOptions(userId,chatId);
+
+        if (usersCurrentBotStateStep == MY_FUTURE_EVENTS ||
+                usersCurrentBotStateStep == MY_EVENTS_BY_GUEST ||
+                usersCurrentBotStateStep == MY_EVENTS_BY_TITLE ||
+                usersCurrentBotStateStep == SHOW_FILTERED_EVENTS_BY_DATES_WAIT ||
+                usersCurrentBotStateStep == MY_EVENTS_BY_DATE_FROM_YEAR ||
+                usersCurrentBotStateStep == MY_EVENTS_BY_DATE_FROM_MONTH) {
+            return processBackToFiltersOptions(userId, chatId);
         }
 
-        return mainMenu.getMainMenuMessage(chatId,answer);
+        return mainMenu.getMainMenuMessage(chatId, answer);
     }
-/////////////////////////////////////////////    CHOOSE_EVENT_FILTER
+
+    /////////////////////////////////////////////    CHOOSE_EVENT_FILTER
     private BotApiMethod<?> processBackToFiltersOptions(int userId, long chatId) {
-        userEventDataCache.setUsersCurrentBotState(userId,GET_EVENTS);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,CHOOSE_EVENT_FILTER);
+        userEventDataCache.setUsersCurrentBotState(userId, GET_EVENTS);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, CHOOSE_EVENT_FILTER);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askMyEventFilterChoose");
-        InlineKeyboardMarkup inlineKeyboardMarkup=keyboardMarkupService.getFilterOptionsKeyboardMarkup();
+        InlineKeyboardMarkup inlineKeyboardMarkup = keyboardMarkupService.getFilterOptionsKeyboardMarkup();
         return replyMessage.setReplyMarkup(inlineKeyboardMarkup);
     }
 
     //////////////////////////////////////////    TEMPLATE 
-    
+
     private BotApiMethod<?> processBackToTemplateRequest(int userId, long chatId) {
-        userEventDataCache.setUsersCurrentBotState(userId,EVENT_FILLED);
+        userEventDataCache.setUsersCurrentBotState(userId, EVENT_FILLED);
         userEventDataCache.setUsersCurrentBotStateStep(userId, EVENT_FORM_VALIDATION);
         EventModel currentEventData = userEventDataCache.getCurrentEventData(userId);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askTemplate");
         String eventType = currentEventData.getEventType();
         InlineKeyboardMarkup imageTemplateKeyboard = userEventDataCache.getImageTemplateKeyboard(eventType);
-        if (isEmptyKeyboard(imageTemplateKeyboard)){
-            imageTemplateKeyboard=keyboardMarkupService.getTemplatesInlineKeyboardMarkup(myUrl,eventType);
-            userEventDataCache.setImageTemplateKeyboard(eventType,imageTemplateKeyboard);
+        if (isEmptyKeyboard(imageTemplateKeyboard)) {
+            imageTemplateKeyboard = keyboardMarkupService.getTemplatesInlineKeyboardMarkup(myUrl, eventType);
+            userEventDataCache.setImageTemplateKeyboard(eventType, imageTemplateKeyboard);
         }
         return replyMessage.setReplyMarkup(imageTemplateKeyboard);
     }
@@ -135,7 +136,7 @@ public class StepBackInputMessageHandler implements InputMessageHandler {
 //////////////////////////////////////////    EVENT_TYPE    
 
     private BotApiMethod<?> processBackToTypeRequest(int userId, long chatId) {
-        userEventDataCache.setUsersCurrentBotState(userId,FILLING_EVENT_FORM);
+        userEventDataCache.setUsersCurrentBotState(userId, FILLING_EVENT_FORM);
         userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_TEMPLATE);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askEventType");
         InlineKeyboardMarkup eventTypesInlineKeyboardMarkup = keyboardMarkupService.getEventTypesInlineKeyboardMarkup();
@@ -143,67 +144,67 @@ public class StepBackInputMessageHandler implements InputMessageHandler {
     }
 
 //////////////////////////////////////////    HOUR 
-    
+
     private BotApiMethod<?> processBackToHourRequest(int userId, long chatId) {
-        userEventDataCache.setUsersCurrentBotState(userId,FILLING_EVENT_FORM);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_EVENT_TYPE);
+        userEventDataCache.setUsersCurrentBotState(userId, FILLING_EVENT_FORM);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_EVENT_TYPE);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askHour");
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(HOUR_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
+        if (isEmptyKeyboard(calendarKeyboard)) {
             calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, 24);
-            userEventDataCache.setCalendarKeyboard(HOUR_CALENDAR,calendarKeyboard);
+            userEventDataCache.setCalendarKeyboard(HOUR_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }
 
     //////////////////////////////////////////    DAY    
-    
+
     private BotApiMethod<?> processBackToDayRequest(int userId, long chatId) {
-        userEventDataCache.setUsersCurrentBotState(userId,FILLING_EVENT_FORM);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_HOUR);
+        userEventDataCache.setUsersCurrentBotState(userId, FILLING_EVENT_FORM);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_HOUR);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askDay");
         EventModel userEventData = userEventDataCache.getCurrentEventData(userId);
         YearMonth yearMonthObject = YearMonth.of(userEventData.getYear(), userEventData.getMonth());
         int daysInMonth = yearMonthObject.lengthOfMonth();
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(daysInMonth + DAY_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
+        if (isEmptyKeyboard(calendarKeyboard)) {
             calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, daysInMonth);
-            userEventDataCache.setCalendarKeyboard(daysInMonth + DAY_CALENDAR,calendarKeyboard);
+            userEventDataCache.setCalendarKeyboard(daysInMonth + DAY_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }
 
     //////////////////////////////////////////    MONTH
-    
+
     private BotApiMethod<?> processBackToMonthRequest(int userId, long chatId) {
-        userEventDataCache.setUsersCurrentBotState(userId,FILLING_EVENT_FORM);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_DAY);
+        userEventDataCache.setUsersCurrentBotState(userId, FILLING_EVENT_FORM);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_DAY);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askMonth");
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(MONTH_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
+        if (isEmptyKeyboard(calendarKeyboard)) {
             calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(1, 12);
-            userEventDataCache.setCalendarKeyboard(MONTH_CALENDAR,calendarKeyboard);
+            userEventDataCache.setCalendarKeyboard(MONTH_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }
 
     //////////////////////////////////////////    YEAR
-    
+
     private BotApiMethod<?> processBackToYearRequest(int userId, long chatId) {
-        userEventDataCache.setUsersCurrentBotState(userId,FILLING_EVENT_FORM);
-        userEventDataCache.setUsersCurrentBotStateStep(userId,ASK_MONTH);
+        userEventDataCache.setUsersCurrentBotState(userId, FILLING_EVENT_FORM);
+        userEventDataCache.setUsersCurrentBotStateStep(userId, ASK_MONTH);
         SendMessage replyMessage = replyMessagesService.getReplyMessage(chatId, "reply.askYear");
         InlineKeyboardMarkup calendarKeyboard = userEventDataCache.getCalendarKeyboard(YEAR_FUTURE_CALENDAR);
-        if (isEmptyKeyboard(calendarKeyboard)){
+        if (isEmptyKeyboard(calendarKeyboard)) {
             int yearNow = LocalDate.now().getYear();
-             calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(yearNow, yearNow + 5);
-             userEventDataCache.setCalendarKeyboard(YEAR_FUTURE_CALENDAR,calendarKeyboard);
+            calendarKeyboard = keyboardMarkupService.getInlineKeyboardMarkupInRange(yearNow, yearNow + 5);
+            userEventDataCache.setCalendarKeyboard(YEAR_FUTURE_CALENDAR, calendarKeyboard);
         }
         return replyMessage.setReplyMarkup(calendarKeyboard);
     }
 
     //////////////////////////////////////////    DESCRIPTION
-    
+
     private BotApiMethod<?> processBackToDescriptionRequest(int userId, long chatId) {
         userEventDataCache.setUsersCurrentBotState(userId, BotState.FILLING_EVENT_FORM);
         userEventDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.ASK_YEAR);
@@ -217,11 +218,10 @@ public class StepBackInputMessageHandler implements InputMessageHandler {
         userEventDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.ASK_DESCRIPTION);
         return replyMessagesService.getReplyMessage(chatId, "reply.askTitle");
     }
-    
-    private boolean isEmptyKeyboard(InlineKeyboardMarkup calendarKeyboard) {
-        return calendarKeyboard.getKeyboard()==null|| calendarKeyboard.getKeyboard().isEmpty();
-    }
 
+    private boolean isEmptyKeyboard(InlineKeyboardMarkup calendarKeyboard) {
+        return calendarKeyboard.getKeyboard() == null || calendarKeyboard.getKeyboard().isEmpty();
+    }
 
 
     @Override

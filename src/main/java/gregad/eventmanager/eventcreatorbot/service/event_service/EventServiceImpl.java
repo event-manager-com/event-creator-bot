@@ -24,11 +24,11 @@ import static gregad.eventmanager.eventcreatorbot.api.ApiConstants.*;
  */
 @Component
 public class EventServiceImpl implements EventService {
-    
+
     private RestTemplate restTemplate;
     private ObjectMapper objectMapper;
     private TokenHolderService tokenHolderService;
-    
+
     @Value("${event.service.url}")
     private String eventServiceUrl;
 
@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
         this.objectMapper = objectMapper;
         this.tokenHolderService = tokenHolderService;
     }
-    
+
     @SneakyThrows
     @Override
     public EventResponseDto createEvent(EventDto event) {
@@ -45,7 +45,7 @@ public class EventServiceImpl implements EventService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         String eventJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(event);
         return restTemplate.exchange(eventServiceUrl, HttpMethod.POST,
-                new HttpEntity<>(eventJson,headers),EventResponseDto.class).getBody();
+                new HttpEntity<>(eventJson, headers), EventResponseDto.class).getBody();
     }
 
     @SneakyThrows
@@ -54,56 +54,56 @@ public class EventServiceImpl implements EventService {
         HttpHeaders headers = getHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String eventJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(event);
-        return restTemplate.exchange(eventServiceUrl+"/"+ownerId,
-                HttpMethod.PATCH,new HttpEntity<>(eventJson,headers),EventResponseDto.class).getBody();
+        return restTemplate.exchange(eventServiceUrl + "/" + ownerId,
+                HttpMethod.PATCH, new HttpEntity<>(eventJson, headers), EventResponseDto.class).getBody();
     }
 
     @Override
     public EventResponseDto deleteEvent(int ownerId, long eventId) {
         HttpHeaders headers = getHeaders();
-        return restTemplate.exchange(eventServiceUrl+"?ownerId="+ownerId+"&eventId="+eventId,
-                HttpMethod.DELETE,new HttpEntity<>(headers),EventResponseDto.class).getBody();
+        return restTemplate.exchange(eventServiceUrl + "?ownerId=" + ownerId + "&eventId=" + eventId,
+                HttpMethod.DELETE, new HttpEntity<>(headers), EventResponseDto.class).getBody();
     }
 
     @Override
     public EventResponseDto getEventById(int ownerId, long eventId) {
         HttpHeaders headers = getHeaders();
-        return restTemplate.exchange(eventServiceUrl+"?ownerId="+ownerId+"&eventId="+eventId,
-                HttpMethod.GET,new HttpEntity<>(headers),EventResponseDto.class).getBody();
+        return restTemplate.exchange(eventServiceUrl + "?ownerId=" + ownerId + "&eventId=" + eventId,
+                HttpMethod.GET, new HttpEntity<>(headers), EventResponseDto.class).getBody();
     }
 
     @Override
     public List<EventResponseDto> getEventByTitle(int ownerId, String title) {
         HttpHeaders headers = getHeaders();
-        return Arrays.asList(restTemplate.exchange(eventServiceUrl+SEARCH+BY_TITLE+"?ownerId="+ownerId+"&title="+title,
-                HttpMethod.GET,new HttpEntity<>(headers),EventResponseDto[].class).getBody());
+        return Arrays.asList(restTemplate.exchange(eventServiceUrl + SEARCH + BY_TITLE + "?ownerId=" + ownerId + "&title=" + title,
+                HttpMethod.GET, new HttpEntity<>(headers), EventResponseDto[].class).getBody());
     }
 
     @Override
     public List<EventResponseDto> getFutureEvents(int ownerId) {
         HttpHeaders headers = getHeaders();
-        return Arrays.asList(restTemplate.exchange(eventServiceUrl+SEARCH+"/"+ownerId,
-                HttpMethod.GET,new HttpEntity<>(headers),EventResponseDto[].class).getBody());
+        return Arrays.asList(restTemplate.exchange(eventServiceUrl + SEARCH + "/" + ownerId,
+                HttpMethod.GET, new HttpEntity<>(headers), EventResponseDto[].class).getBody());
     }
 
     @Override
     public List<EventResponseDto> getEventsByDate(int ownerId, LocalDate from, LocalDate to) {
         HttpHeaders headers = getHeaders();
-        return Arrays.asList(restTemplate.exchange(eventServiceUrl+SEARCH+BY_DATES+"?ownerId="+ownerId+"&from="+from+"&to="+to,
-                HttpMethod.GET,new HttpEntity<>(headers),EventResponseDto[].class).getBody());
+        return Arrays.asList(restTemplate.exchange(eventServiceUrl + SEARCH + BY_DATES + "?ownerId=" + ownerId + "&from=" + from + "&to=" + to,
+                HttpMethod.GET, new HttpEntity<>(headers), EventResponseDto[].class).getBody());
     }
 
     @Override
     public List<EventResponseDto> getEventsByInvitedUser(int ownerId, String userInvited) {
         HttpHeaders headers = getHeaders();
-        return Arrays.asList(restTemplate.exchange(eventServiceUrl+SEARCH+BY_GUEST+"?ownerId="+ownerId+"&guest="+userInvited,
-                HttpMethod.GET,new HttpEntity<>(headers), EventResponseDto[].class).getBody());
+        return Arrays.asList(restTemplate.exchange(eventServiceUrl + SEARCH + BY_GUEST + "?ownerId=" + ownerId + "&guest=" + userInvited,
+                HttpMethod.GET, new HttpEntity<>(headers), EventResponseDto[].class).getBody());
     }
 
 
     private HttpHeaders getHeaders() {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set(HEADER,tokenHolderService.getToken());
+        httpHeaders.set(HEADER, tokenHolderService.getToken());
         return httpHeaders;
     }
 

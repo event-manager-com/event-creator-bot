@@ -19,10 +19,10 @@ public class TelegramFacade {
     private UserEventDataCache userDataCache;
     private MainMenu mainMenu;
 
-    public TelegramFacade( BotStateContext botStateContext, UserEventDataCache userDataCache, MainMenu mainMenu) {
+    public TelegramFacade(BotStateContext botStateContext, UserEventDataCache userDataCache, MainMenu mainMenu) {
         this.botStateContext = botStateContext;
         this.userDataCache = userDataCache;
-        this.mainMenu=mainMenu;
+        this.mainMenu = mainMenu;
     }
 
     public BotApiMethod<?> handleUpdate(Update update) {
@@ -34,17 +34,17 @@ public class TelegramFacade {
     private BotApiMethod<?> handleInputMessage(Update update) {
         String inputMsg;
         int userId;
-        if (update.hasCallbackQuery()){
+        if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
-            inputMsg=callbackQuery.getData();
-            userId=callbackQuery.getFrom().getId();
-        }else {
+            inputMsg = callbackQuery.getData();
+            userId = callbackQuery.getFrom().getId();
+        } else {
             inputMsg = update.getMessage().getText();
             userId = update.getMessage().getFrom().getId();
         }
         BotState botState;
         BotApiMethod replyMessage;
-        if (inputMsg==null){
+        if (inputMsg == null) {
             return botStateContext.processInputMessage(SHOW_MAIN_MENU, update);
         }
         switch (inputMsg) {
@@ -53,7 +53,7 @@ public class TelegramFacade {
                 userDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.NO_STATE_STEP);
                 break;
             case "New Event":
-                botState=FILLING_EVENT_FORM;
+                botState = FILLING_EVENT_FORM;
                 userDataCache.setUsersCurrentBotStateStep(userId, BotStateStep.NO_STATE_STEP);
                 break;
             case "My Events":
@@ -79,5 +79,5 @@ public class TelegramFacade {
 
         return replyMessage;
     }
-    
+
 }

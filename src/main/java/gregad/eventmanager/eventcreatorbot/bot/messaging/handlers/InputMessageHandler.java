@@ -9,5 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  */
 public interface InputMessageHandler {
     BotApiMethod<?> handle(Update update);
+
     BotState getHandlerName();
 }

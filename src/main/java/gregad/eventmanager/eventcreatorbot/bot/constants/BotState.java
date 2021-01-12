@@ -28,5 +28,5 @@ public enum BotState {
     EVENT_FILLED,
     GET_EVENTS,
     SHOW_HELP_MENU;
-    
+
 }

@@ -7,7 +7,10 @@ import gregad.eventmanager.eventcreatorbot.dto.UserDto;
  */
 public interface UserService {
     UserDto createUser(int id, String name);
+
     UserDto updateUser(int id, String name);
+
     UserDto deleteUser(int id);
+
     UserDto getUser(int id);
 }

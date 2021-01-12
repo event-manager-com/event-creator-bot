@@ -15,10 +15,11 @@ public class InitTokenPostConstructEventListener implements ApplicationListener<
     public static boolean isExecuted;
     @Autowired
     private ApplicationContext context;
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         if (!isExecuted) {
-            isExecuted=true;
+            isExecuted = true;
             TokenHolderServiceImpl bean = context.getBean(TokenHolderServiceImpl.class);
             bean.refreshToken();
         }

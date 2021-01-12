@@ -25,7 +25,7 @@ public class ImageServiceImpl implements ImageService {
     private RestTemplate restTemplate;
     private ObjectMapper objectMapper;
     private TokenHolderService tokenHolderService;
-    
+
     @Value("${image.service.url}")
     private String imageServiceUrl;
 
@@ -42,12 +42,12 @@ public class ImageServiceImpl implements ImageService {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         String eventJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(eventDto);
-        ResponseEntity<ImageResponseDto> response = 
+        ResponseEntity<ImageResponseDto> response =
                 restTemplate.exchange(imageServiceUrl + "/" + imageId,
                         HttpMethod.POST,
-                        new HttpEntity<>(eventJson, httpHeaders), 
+                        new HttpEntity<>(eventJson, httpHeaders),
                         ImageResponseDto.class);
-        
+
         return response.getBody();
     }
 

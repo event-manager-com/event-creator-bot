@@ -16,10 +16,10 @@ import java.util.List;
  */
 @Component
 public class MainMenu {
-    
-    public BotApiMethod<?> getMainMenuMessage( long chatId,  String textMessage) {
-         ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard();
-         SendMessage mainMenuMessage =
+
+    public BotApiMethod<?> getMainMenuMessage(long chatId, String textMessage) {
+        ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard();
+        SendMessage mainMenuMessage =
                 createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
         return mainMenuMessage;
     }
@@ -45,9 +45,9 @@ public class MainMenu {
         return replyKeyboardMarkup;
     }
 
-    private SendMessage createMessageWithKeyboard( long chatId,
+    private SendMessage createMessageWithKeyboard(long chatId,
                                                   String textMessage,
-                                                   ReplyKeyboardMarkup replyKeyboardMarkup) {
+                                                  ReplyKeyboardMarkup replyKeyboardMarkup) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(chatId);

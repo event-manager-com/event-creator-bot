@@ -21,15 +21,15 @@ public class Bot extends TelegramWebhookBot {
     private String botUserName;
     private String botToken;
     private String botWebHookUrl;
-    
+
 
     private TelegramFacade telegramFacade;
-    
-    public Bot(DefaultBotOptions options, TelegramFacade telegramFacade){
+
+    public Bot(DefaultBotOptions options, TelegramFacade telegramFacade) {
         super(options);
-        this.telegramFacade=telegramFacade;
+        this.telegramFacade = telegramFacade;
     }
-    
+
     @Override
     public String getBotUsername() {
         return botUserName;
@@ -49,7 +49,7 @@ public class Bot extends TelegramWebhookBot {
 //        execute(sendPhoto);
         return telegramFacade.handleUpdate(update);
     }
-    
+
 
     @Override
     public String getBotPath() {

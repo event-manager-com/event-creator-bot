@@ -21,7 +21,7 @@ public class BotStateContext {
     }
 
     public BotApiMethod processInputMessage(BotState currentState, Update update) {
-    //    InputMessageHandler currentMessageHandler = findMessageHandler(currentState);
+        //    InputMessageHandler currentMessageHandler = findMessageHandler(currentState);
         return messageHandlers.get(currentState).handle(update);
     }
 

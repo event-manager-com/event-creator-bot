@@ -27,10 +27,10 @@ public class BotController {
     @Autowired
     private Bot bot;
 
-    @RequestMapping(value = "/template/{templateId}",method = { RequestMethod.GET},produces = MediaType.IMAGE_JPEG_VALUE)
+    @RequestMapping(value = "/template/{templateId}", method = {RequestMethod.GET}, produces = MediaType.IMAGE_JPEG_VALUE)
     public void getImage(HttpServletResponse response, @PathVariable String templateId) throws IOException {
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-        FileInputStream fileInputStream = new FileInputStream(new File(BotConstants.PATH_TO_TEMPLATES +templateId));
+        FileInputStream fileInputStream = new FileInputStream(new File(BotConstants.PATH_TO_TEMPLATES + templateId));
         StreamUtils.copy(fileInputStream, response.getOutputStream());
     }
 

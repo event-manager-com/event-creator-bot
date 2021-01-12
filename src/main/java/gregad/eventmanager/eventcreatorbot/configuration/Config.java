@@ -49,10 +49,10 @@ public class Config {
     private int proxyPort;
     @Value("${rest.template.timeout}")
     private long timeout;
-    
-    public static final String TELEGRAM_REGISTRATION_URL="https://api.telegram.org/bot";
-    
-    
+
+    public static final String TELEGRAM_REGISTRATION_URL = "https://api.telegram.org/bot";
+
+
     @Bean
     public Bot bot(TelegramFacade telegramFacade) throws TelegramApiRequestException {
         DefaultBotOptions options = ApiContext
@@ -61,23 +61,24 @@ public class Config {
         options.setProxyHost(proxyHost);
         options.setProxyPort(proxyPort);
         options.setProxyType(proxyType);
-        Bot bot = new Bot(options,telegramFacade);
+        Bot bot = new Bot(options, telegramFacade);
         bot.setBotToken(botToken);
         bot.setBotUserName(botUserName);
         bot.setBotWebHookUrl(webHookPath);
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.exchange(TELEGRAM_REGISTRATION_URL+botToken+"/setWebhook?url="+webHookPath,
-                HttpMethod.GET,null,Void.class);
+        restTemplate.exchange(TELEGRAM_REGISTRATION_URL + botToken + "/setWebhook?url=" + webHookPath,
+                HttpMethod.GET, null, Void.class);
         return bot;
     }
-    
+
     @Bean
     @LoadBalanced
-    public RestTemplate restTemplate(RestTemplateBuilder builder){
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.setConnectTimeout(Duration.ofMillis(timeout))
                 .setReadTimeout(Duration.ofMillis(timeout))
                 .build();
     }
+
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource

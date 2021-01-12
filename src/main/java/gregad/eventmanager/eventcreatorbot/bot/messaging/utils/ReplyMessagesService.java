@@ -19,9 +19,9 @@ public class ReplyMessagesService {
         return new SendMessage(chatId, localeMessageService.getMessage(replyMessage));
     }
 
-    public SendMessage getReplyMessage(long chatId, String replyMessage,String suffix) {
+    public SendMessage getReplyMessage(long chatId, String replyMessage, String suffix) {
         String message = localeMessageService.getMessage(replyMessage);
-        return new SendMessage(chatId, message+"\n"+suffix);
+        return new SendMessage(chatId, message + "\n" + suffix);
     }
 
     public SendMessage getReplyMessage(long chatId, String replyMessage, Object... args) {

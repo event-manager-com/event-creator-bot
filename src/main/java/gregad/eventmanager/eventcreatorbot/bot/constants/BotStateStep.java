@@ -3,7 +3,7 @@ package gregad.eventmanager.eventcreatorbot.bot.constants;
 /**
  * @author Greg Adler
  */
-public enum BotStateStep{
+public enum BotStateStep {
     ASK_TITLE,
     ASK_DESCRIPTION,
     ASK_YEAR,
@@ -12,11 +12,11 @@ public enum BotStateStep{
     ASK_HOUR,
     ASK_EVENT_TYPE,
     ASK_TEMPLATE,
-    
+
     EVENT_FORM_VALIDATION,
     EVENT_FORM_CONFIRMATION,
     NO_STATE_STEP,
-    
+
     CHOOSE_EVENT_FILTER,
     SHOW_FILTERED_EVENTS_BY_DATES,
     SHOW_FILTERED_EVENTS_BY_DATES_WAIT,

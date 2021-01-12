@@ -5,5 +5,6 @@ package gregad.eventmanager.eventcreatorbot.service.token_service;
  */
 public interface TokenHolderService {
     void refreshToken();
+
     String getToken();
 }
